@@ -1,9 +1,13 @@
 const express = require("express");
-
+const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 8080;
 app.use(express.json());
-require("./app/routes/tasks.routes.js")(app);
+app.use(cors());
+require("./app/routes/projects.routes.js")(app);
+require("./app/routes/tasks.router.js")(app);
+require("./app/routes/comments.router.js")(app);
+require("./app/routes/label.router.js")(app);
 const db = require("./app/models");
 db.sequelize
   .sync()

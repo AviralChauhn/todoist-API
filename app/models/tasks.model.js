@@ -1,46 +1,60 @@
 module.exports = (sequelize, Sequelize) => {
-  const Tasks = sequelize.define("tasks", {
+  const Task = sequelize.define("task", {
     id: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.STRING,
       primaryKey: true,
     },
-    name: {
+    projectId: {
       type: Sequelize.STRING,
     },
+    sectionId: {
+      type: Sequelize.STRING,
+    },
+    content: {
+      type: Sequelize.STRING,
+    },
+    description: {
+      type: Sequelize.STRING,
+    },
+    isCompleted: {
+      type: Sequelize.BOOLEAN,
+    },
+    labels: {
+      type: Sequelize.ARRAY(Sequelize.STRING),
+    },
     parentId: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.STRING,
     },
     order: {
       type: Sequelize.INTEGER,
     },
-    color: {
-      type: Sequelize.STRING,
+    priority: {
+      type: Sequelize.INTEGER,
     },
-    name: {
+    due: {
+      type: Sequelize.JSONB,
+    },
+    url: {
       type: Sequelize.STRING,
     },
     commentCount: {
       type: Sequelize.INTEGER,
     },
-    isShared: {
-      type: Sequelize.BOOLEAN,
-    },
-    isFavourite: {
-      type: Sequelize.BOOLEAN,
-    },
-    isInboxProject: {
-      type: Sequelize.BOOLEAN,
-    },
-    isTeamInbox: {
-      type: Sequelize.BOOLEAN,
-    },
-    url: {
+    created_At: {
       type: Sequelize.STRING,
     },
-    viewStyle: {
+    creatorId: {
       type: Sequelize.STRING,
+    },
+    assigneeId: {
+      type: Sequelize.STRING,
+    },
+    assignerId: {
+      type: Sequelize.STRING,
+    },
+    duration: {
+      type: Sequelize.JSONB,
     },
   });
-
-  return Tasks;
+  return Task;
 };

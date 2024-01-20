@@ -17,6 +17,8 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
+db.projects = require("./projects.model.js")(sequelize, Sequelize);
 db.tasks = require("./tasks.model.js")(sequelize, Sequelize);
-
+db.comments = require("./comments.model.js")(sequelize, Sequelize);
+db.labels = require("./label.model.js")(sequelize, Sequelize);
 module.exports = db;

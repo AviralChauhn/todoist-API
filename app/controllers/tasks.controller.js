@@ -3,40 +3,48 @@ const Tasks = db.tasks;
 const Op = db.Sequelize.Op;
 
 exports.findAll = (req, res) => {
-  const id = req.query.id;
-  var condition = id ? { id: { [Op.iLike]: `%${id}%` } } : null;
-  Tasks.findAll({ where: condition })
+  Tasks.findAll({
+    where: {
+      isCompleted: false,
+    },
+  })
     .then((data) => {
       res.send(data);
     })
     .catch((err) => {
       res.status(500).send({
-        message: err.message || `Some error while getting tasks`,
+        message: `Some error while getting tasks`,
       });
     });
 };
 exports.create = (req, res) => {
   if (!req.body.id) {
     res.status(400).send({
-      message: "id cannot be empty",
+      message: "Id Cannot be empty",
     });
     return;
   }
-  const tasks = {
+  const task = {
     id: req.body.id,
-    parentId: req.body.parentId,
-    order: req.body.order,
-    color: req.body.color,
-    name: req.body.name,
+    projectId: req.body.projectId,
+    sectionId: req.body.sectionId ? req.body.sectionId : null,
+    content: req.body.content,
+    description: req.body.description,
+    isCompleted: req.body.isCompleted ? req.body.isCompleted : false,
+    labels: req.body.labels ? req.body.labels : [],
+    parentId: req.body.parentId ? req.body.parentId : null,
+    order: req.body.order ? req.body.order : null,
+    priority: req.body.priority ? req.body.priority : null,
+    due: req.body.due ? req.body.due : {},
+    url: req.body.url ? req.body.url : null,
     commentCount: req.body.commentCount ? req.body.commentCount : 0,
-    isShared: req.body.isShared,
-    isFavorite: req.body.isFavorite,
-    isInboxProject: req.body.isInboxProject,
-    isTeamInbox: req.body.idTeamInbox,
-    viewStyle: req.body.viewStyle,
-    url: req.body.url,
+    created_At: req.body.created_At ? req.body.created_At : 0,
+    creatorId: req.body.creatorId ? req.body.creatorId : 0,
+    assigneeId: req.body.assigneeId ? req.body.assigneeId : 0,
+    assignerId: req.body.assignerId ? req.body.assignerId : 0,
+    duration: req.body.duration ? req.body.duration : {},
   };
-  Tasks.create(tasks)
+  Tasks.create(task)
     .then((data) => {
       res.send(data);
     })
@@ -44,24 +52,6 @@ exports.create = (req, res) => {
       res.status(500).send({
         message:
           err.message || "Some error occurred while creating the Tutorial..",
-      });
-    });
-};
-exports.findById = (req, res) => {
-  const id = req.params.id;
-  Tasks.findByPk(id)
-    .then((data) => {
-      if (data) {
-        res.send(data);
-      } else {
-        res.status(404).send({
-          message: `Cannot find Tutorial with id=${id}`,
-        });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: `Error retrieving Task with id=` + id,
       });
     });
 };
@@ -87,7 +77,7 @@ exports.update = (req, res) => {
       });
     });
 };
-exports.delete = (req, res) => {
+exports.deleteTask = (req, res) => {
   const id = req.params.id;
   Tasks.destroy({
     where: { id: id },
@@ -106,6 +96,53 @@ exports.delete = (req, res) => {
     .catch((err) => {
       res.status(500).send({
         message: "Could not delete Task with id=" + id,
+      });
+    });
+};
+exports.findOne = (req, res) => {
+  const id = req.params.id;
+  Tasks.findAll({
+    where: { id: id, isCompleted: true },
+  })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "SThis task is completed",
+      });
+    });
+};
+
+exports.toggleIsCompleted = (req, res) => {
+  const taskId = req.params.id;
+  Tasks.findByPk(taskId)
+    .then((task) => {
+      if (!task) {
+        return res.status(404).send({
+          message: `Cannot find Task with id=${taskId}`,
+        });
+      }
+
+      const newStatus = !task.isCompleted;
+
+      return Tasks.update(
+        { isCompleted: newStatus },
+        {
+          where: {
+            id: taskId,
+          },
+        }
+      );
+    })
+    .then(() => {
+      res.status(201).send({
+        message: "Completion state updates successfully...",
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: `Error toggling Task status with id=${taskId}: ${err.message}`,
       });
     });
 };

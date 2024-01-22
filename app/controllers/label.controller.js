@@ -92,24 +92,62 @@ exports.update = (req, res) => {
     });
 };
 exports.deleteLabel = (req, res) => {
-  const id = req.params.id;
-  Labels.destroy({
-    where: { id: id },
-  })
-    .then((num) => {
-      if (num == 1) {
-        res.send({
-          message: "Deletion successful",
-        });
-      } else {
-        res.send({
-          message: "error deleting",
+  const labelId = req.params.id;
+  const taskId = req.body.taskId; // Make sure to have task_id available in your request body
+
+  Labels.findOne({ where: { id: labelId } })
+    .then((label) => {
+      if (!label) {
+        return res.status(404).send({
+          message: `Label with id=${labelId} not found.`,
         });
       }
+
+      const labelName = label.name;
+
+      Labels.destroy({ where: { id: labelId } })
+        .then((numDeleted) => {
+          if (numDeleted === 1) {
+            Task.findOne({ where: { id: taskId } })
+              .then((task) => {
+                if (task) {
+                  task.labels = task.labels.filter(
+                    (name) => name !== labelName
+                  );
+                  return task.save();
+                } else {
+                  return Promise.reject(
+                    `Associated Task with id=${taskId} not found.`
+                  );
+                }
+              })
+              .then(() => {
+                res.send({
+                  message: "Label was deleted successfully!",
+                });
+              })
+              .catch((error) => {
+                res.send({
+                  message: `Label was deleted, but ${error}`,
+                });
+              });
+          } else {
+            res.send({
+              message: `Cannot delete Label with id=${labelId}. Maybe Label was not found...`,
+            });
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).send({
+            message: `Error occurred while deleting Label with id=${labelId}.`,
+          });
+        });
     })
     .catch((err) => {
-      res.send({
-        message: "Cannot delete the label with id " + id + "facing error" + err,
+      console.error(err);
+      res.status(500).send({
+        message: `Error occurred while finding Label with id=${labelId}.`,
       });
     });
 };

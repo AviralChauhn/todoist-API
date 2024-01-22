@@ -13,9 +13,17 @@ module.exports = (sequelize, Sequelize) => {
     },
     projectId: {
       type: Sequelize.STRING,
+      references: {
+        model: "projects",
+        key: "id",
+      },
     },
     taskId: {
       type: Sequelize.STRING,
+      references: {
+        model: "tasks",
+        key: "id",
+      },
     },
     attachment: {
       type: Sequelize.JSONB,

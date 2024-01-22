@@ -15,7 +15,7 @@ db.sequelize
     console.log("Synced db");
   })
   .catch((err) => {
-    console.log("Failed TO Sync");
+    console.log("Failed TO Sync", err);
   });
 app.get("/", (req, res) => {
   res.status(201).json({ message: "server started" });

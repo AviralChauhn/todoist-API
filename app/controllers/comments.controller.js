@@ -1,5 +1,7 @@
 const db = require("../models");
 const Comments = db.comments;
+const Task = db.tasks;
+const Project = db.projects;
 const Op = db.Sequelize.Op;
 exports.findAll = (req, res) => {
   Comments.findAll()
@@ -28,12 +30,33 @@ exports.create = (req, res) => {
     attachment: req.body.attachment ? req.body.attachment : null,
   };
   Comments.create(comment)
+    .then((createdComment) => {
+      // Update comment_count of the associated task
+      return Task.findByPk(comment.taskId);
+    })
+    .then((task) => {
+      if (task) {
+        // Increment comment_count and update the task
+        task.commentCount += 1;
+        return task.save();
+      } else {
+        throw new Error("Task not found.");
+      }
+    })
     .then((data) => {
-      res.send(data);
+      return Project.findByPk(comment.projectId);
+    })
+    .then((project) => {
+      project.commentCount += 1;
+      return project.save();
+    })
+    .then((updatedTask) => {
+      res.send(updatedTask);
     })
     .catch((err) => {
-      res.status(401).send({
-        message: "Error Occured",
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while creating the Comment.",
       });
     });
 };
@@ -74,24 +97,70 @@ exports.findOne = (req, res) => {
     });
 };
 exports.deleteComment = (req, res) => {
-  const id = req.params.id;
-  Comments.destroy({
-    where: { id: id },
-  })
-    .then((num) => {
-      if (num == 1) {
-        res.send({
-          message: "Comment Deleted succefully.....",
-        });
-      } else {
-        res.send({
-          message: `Cannot delete Comment with is =${id}. Maybe Task was not Found...`,
+  const commentId = req.params.id;
+
+  Comments.findByPk(commentId)
+    .then((comment) => {
+      if (!comment) {
+        return res.status(404).send({
+          message: `Comment with id=${commentId} not found.`,
         });
       }
+
+      const taskId = comment.taskId;
+
+      Comments.destroy({ where: { id: commentId } })
+        .then((numDeleted) => {
+          if (numDeleted === 1) {
+            Task.findByPk(taskId)
+              .then((task) => {
+                if (task) {
+                  task.commentCount = Math.max(0, task.commentCount - 1);
+                  return task.save();
+                } else {
+                  return Promise.reject(
+                    `Associated Task with id=${taskId} not found.`
+                  );
+                }
+              })
+              .catch((error) => {
+                res.send({
+                  message: `Comment was deleted, but ${error}`,
+                });
+              });
+            Project.findByPk(comment.projectId)
+              .then((project) => {
+                if (project) {
+                  project.commentCount = Math.max(0, project.commentCount - 1);
+                  return project.save();
+                } else {
+                  return Promise.reject(
+                    `Associated Project with id=${comment.projectId} not found`
+                  );
+                }
+              })
+              .then(() => {
+                res.send({
+                  message: "Comment was deleted successfully!",
+                });
+              });
+          } else {
+            res.send({
+              message: `Cannot delete Comment with id=${commentId}. Maybe Comment was not found...`,
+            });
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).send({
+            message: `Error occurred while deleting Comment with id=${commentId}.`,
+          });
+        });
     })
     .catch((err) => {
+      console.error(err);
       res.status(500).send({
-        message: "Could not delete comment with id=" + id,
+        message: `Error occurred while finding Comment with id=${commentId}.`,
       });
     });
 };

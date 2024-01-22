@@ -6,6 +6,10 @@ module.exports = (sequelize, Sequelize) => {
     },
     projectId: {
       type: Sequelize.STRING,
+      references: {
+        model: "projects", // This should match the name of the Project model
+        key: "id",
+      },
     },
     sectionId: {
       type: Sequelize.STRING,
@@ -21,9 +25,6 @@ module.exports = (sequelize, Sequelize) => {
     },
     labels: {
       type: Sequelize.ARRAY(Sequelize.STRING),
-    },
-    parentId: {
-      type: Sequelize.STRING,
     },
     order: {
       type: Sequelize.INTEGER,
@@ -56,5 +57,8 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.JSONB,
     },
   });
+  Task.associate = (models) => {
+    Task.belongsTo(models.Projects, { foreignKey: "projectId", as: "project" });
+  };
   return Task;
 };

@@ -25,7 +25,7 @@ exports.create = (req, res) => {
     id: req.body.id,
     content: req.body.content ? req.body.content : null,
     posted_At: req.body.posted_At ? req.body.posted_At : null,
-    projectId: req.body.projectId ? req.body.projectId : null,
+    projectId: req.body.projectId,
     taskId: req.body.taskId,
     attachment: req.body.attachment ? req.body.attachment : null,
   };

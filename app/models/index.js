@@ -25,12 +25,14 @@ const Project = require("./projects.model.js")(sequelize, Sequelize);
 const Task = require("./tasks.model.js")(sequelize, Sequelize);
 const Comment = require("./comments.model.js")(sequelize, Sequelize);
 const Label = require("./label.model.js")(sequelize, Sequelize);
+db.user = require("../models/user.model.js")(sequelize, Sequelize);
 Project.hasMany(Task, { foreignKey: "projectId" });
 Task.belongsTo(Project, { foreignKey: "projectId" });
 Task.hasMany(Comment, { foreignKey: "taskId" });
 Comment.belongsTo(Task, { foreignKey: "taskId" });
 Project.hasMany(Comment, { foreignKey: "projectId" });
 Comment.belongsTo(Project, { foreignKey: "projectId" });
+
 module.exports = {
   Project,
   Task,

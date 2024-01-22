@@ -6,6 +6,7 @@ module.exports = (sequelize, Sequelize) => {
     },
     projectId: {
       type: Sequelize.STRING,
+      allowNull: false,
       references: {
         model: "projects", // This should match the name of the Project model
         key: "id",

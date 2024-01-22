@@ -8,6 +8,7 @@ require("./app/routes/projects.routes.js")(app);
 require("./app/routes/tasks.router.js")(app);
 require("./app/routes/comments.router.js")(app);
 require("./app/routes/label.router.js")(app);
+require("./app/routes/auth.routes.js")(app);
 const db = require("./app/models");
 db.sequelize
   .sync()

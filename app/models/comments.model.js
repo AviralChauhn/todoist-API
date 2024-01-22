@@ -2,7 +2,7 @@ module.exports = (sequelize, Sequelize) => {
   const Comment = sequelize.define("comment", {
     id: {
       type: Sequelize.STRING,
-      required: true,
+      allowNull: false,
       primaryKey: true,
     },
     content: {
@@ -13,6 +13,7 @@ module.exports = (sequelize, Sequelize) => {
     },
     projectId: {
       type: Sequelize.STRING,
+      allowNull: false,
       references: {
         model: "projects",
         key: "id",
@@ -20,6 +21,7 @@ module.exports = (sequelize, Sequelize) => {
     },
     taskId: {
       type: Sequelize.STRING,
+      allowNull: false,
       references: {
         model: "tasks",
         key: "id",

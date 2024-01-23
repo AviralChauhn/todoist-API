@@ -40,6 +40,13 @@ module.exports = (sequelize, Sequelize) => {
     viewStyle: {
       type: Sequelize.STRING,
     },
+    username: {
+      type: Sequelize.STRING,
+      references: {
+        model: "users",
+        key: "username",
+      },
+    },
   });
   return Projects;
 };

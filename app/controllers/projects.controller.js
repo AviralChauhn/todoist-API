@@ -1,51 +1,71 @@
+const { authJwt } = require("../middleware");
 const db = require("../models");
 const Projects = db.projects;
 const Op = db.Sequelize.Op;
-
+// const jwt=require("jsonwebtoken")
+// const config=require('../config/auth.config')
 exports.findAll = (req, res) => {
   const id = req.query.id;
-  var condition = id ? { id: { [Op.iLike]: `%${id}%` } } : null;
-  Projects.findAll({ where: condition })
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: err.message || `Some error while getting Projects`,
-      });
-    });
+  const username = req.body.username;
+  authJwt.verifyToken(req, res, () => {
+    if (req.userId === req.body.username) {
+      Projects.findAll({
+        where: {
+          username: username,
+        },
+      })
+        .then((data) => {
+          res.send(data);
+        })
+        .catch((err) => {
+          res.status(500).send({
+            message: err.message || `Some error while getting Projects`,
+          });
+        });
+    } else {
+      res.send({ message: "Username Not authorized" });
+    }
+  });
 };
 exports.create = (req, res) => {
-  if (!req.body.id) {
-    res.status(400).send({
-      message: "id cannot be empty",
-    });
-    return;
-  }
-  const projects = {
-    id: req.body.id,
-    parentId: req.body.parentId,
-    order: req.body.order,
-    color: req.body.color,
-    name: req.body.name,
-    commentCount: req.body.commentCount ? req.body.commentCount : 0,
-    isShared: req.body.isShared,
-    isFavorite: req.body.isFavorite,
-    isInboxProject: req.body.isInboxProject,
-    isTeamInbox: req.body.idTeamInbox,
-    viewStyle: req.body.viewStyle,
-    url: req.body.url,
-  };
-  Projects.create(projects)
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while creating the Tutorial..",
-      });
-    });
+  authJwt.verifyToken(req, res, () => {
+    if (req.userId === req.body.username) {
+      if (!req.body.id) {
+        res.status(400).send({
+          message: "id cannot be empty",
+        });
+        return;
+      }
+      const projects = {
+        id: req.body.id,
+        parentId: req.body.parentId,
+        order: req.body.order,
+        color: req.body.color,
+        name: req.body.name,
+        commentCount: req.body.commentCount ? req.body.commentCount : 0,
+        isShared: req.body.isShared,
+        isFavorite: req.body.isFavorite,
+        isInboxProject: req.body.isInboxProject,
+        isTeamInbox: req.body.idTeamInbox,
+        viewStyle: req.body.viewStyle,
+        url: req.body.url,
+        username: req.body.username,
+      };
+      Projects.create(projects)
+        .then((data) => {
+          res.send(data);
+        })
+        .catch((err) => {
+          res.status(500).send({
+            message:
+              err.message ||
+              "Some error occurred while creating the Tutorial..",
+          });
+        });
+    } else {
+      res.send({ message: "Username not authorized" });
+    }
+  });
 };
 exports.findById = (req, res) => {
   const id = req.params.id;

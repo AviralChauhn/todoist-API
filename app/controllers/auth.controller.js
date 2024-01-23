@@ -41,15 +41,17 @@ exports.signin = (req, res) => {
           message: "Invalid Password!",
         });
       }
-      const token = jwt.sign({ id: user.id }, config.secret, {
+      const token = jwt.sign({ id: user.username }, config.secret, {
         algorithm: "HS256",
         allowInsecureKeySizes: true,
         expiresIn: 86400, // 24 hours
       });
+      return token;
     })
-    .then(() => {
+    .then((token) => {
       return res.send({
         message: "Login successfull!!",
+        accessToken: token,
       });
     })
     .catch((err) => {

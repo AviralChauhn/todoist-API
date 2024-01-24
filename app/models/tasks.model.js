@@ -1,11 +1,12 @@
 module.exports = (sequelize, Sequelize) => {
   const Task = sequelize.define("task", {
     id: {
-      type: Sequelize.STRING,
+      type: Sequelize.UUID,
       primaryKey: true,
+      defaultValue: Sequelize.UUIDV4,
     },
     projectId: {
-      type: Sequelize.STRING,
+      type: Sequelize.UUID,
       allowNull: false,
       references: {
         model: "projects", // This should match the name of the Project model
@@ -56,6 +57,13 @@ module.exports = (sequelize, Sequelize) => {
     },
     duration: {
       type: Sequelize.JSONB,
+    },
+    username: {
+      type: Sequelize.STRING,
+      references: {
+        model: "users",
+        key: "username",
+      },
     },
   });
   Task.associate = (models) => {

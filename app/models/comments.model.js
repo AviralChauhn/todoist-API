@@ -1,9 +1,9 @@
 module.exports = (sequelize, Sequelize) => {
   const Comment = sequelize.define("comment", {
     id: {
-      type: Sequelize.STRING,
-      allowNull: false,
+      type: Sequelize.UUID,
       primaryKey: true,
+      defaultValue: Sequelize.UUIDV4,
     },
     content: {
       type: Sequelize.STRING,
@@ -12,7 +12,7 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
     },
     projectId: {
-      type: Sequelize.STRING,
+      type: Sequelize.UUID,
       allowNull: false,
       references: {
         model: "projects",
@@ -20,7 +20,7 @@ module.exports = (sequelize, Sequelize) => {
       },
     },
     taskId: {
-      type: Sequelize.STRING,
+      type: Sequelize.UUID,
       allowNull: false,
       references: {
         model: "tasks",
@@ -29,6 +29,13 @@ module.exports = (sequelize, Sequelize) => {
     },
     attachment: {
       type: Sequelize.JSONB,
+    },
+    username: {
+      type: Sequelize.STRING,
+      references: {
+        model: "users",
+        key: "username",
+      },
     },
   });
   return Comment;

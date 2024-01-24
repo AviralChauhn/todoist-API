@@ -29,6 +29,12 @@ const Label = require("./label.model.js")(sequelize, Sequelize);
 const User = require("./user.model.js")(sequelize, Sequelize);
 User.hasMany(Project, { foreignKey: "username" });
 Project.belongsTo(User, { foreignKey: "username" });
+User.hasMany(Task, { foreignKey: "username" });
+Task.belongsTo(User, { foreignKey: "username" });
+User.hasMany(Comment, { foreignKey: "username" }),
+  Comment.belongsTo(User, { foreignKey: "username" });
+User.hasMany(Label, { foreignKey: "username" });
+Label.belongsTo(User, { foreignKey: "username" });
 Project.hasMany(Task, { foreignKey: "projectId" });
 Task.belongsTo(Project, { foreignKey: "projectId" });
 Task.hasMany(Comment, { foreignKey: "taskId" });

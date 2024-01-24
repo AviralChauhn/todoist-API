@@ -1,9 +1,10 @@
 module.exports = (sequelize, Sequelize) => {
   const Label = sequelize.define("label", {
     id: {
-      type: Sequelize.STRING,
+      type: Sequelize.UUID,
       required: true,
       primaryKey: true,
+      defaultValue: Sequelize.UUIDV4,
     },
     name: {
       type: Sequelize.STRING,
@@ -17,6 +18,13 @@ module.exports = (sequelize, Sequelize) => {
     },
     isFavourite: {
       type: Sequelize.BOOLEAN,
+    },
+    username: {
+      type: Sequelize.STRING,
+      references: {
+        model: "users",
+        key: "username",
+      },
     },
   });
   return Label;

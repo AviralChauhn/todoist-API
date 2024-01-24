@@ -1,8 +1,9 @@
 module.exports = (sequelize, Sequelize) => {
   const Projects = sequelize.define("projects", {
     id: {
-      type: Sequelize.STRING,
+      type: Sequelize.UUID,
       primaryKey: true,
+      defaultValue: Sequelize.UUIDV4,
     },
     name: {
       type: Sequelize.STRING,

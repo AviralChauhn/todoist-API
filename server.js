@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+const { logger } = require("./app/logger/logger.js");
+const { logConsole } = require("./app/logger/logger.js");
 const app = express();
 const PORT = process.env.PORT || 8080;
 app.use(express.json());
@@ -16,7 +18,8 @@ db.sequelize
     console.log("Synced db");
   })
   .catch((err) => {
-    console.log("Failed TO Sync", err);
+    logger.error(`Failed TO Sync ${err}`);
+    logConsole.error(`Failed TO Sync ${err}`);
   });
 app.get("/", (req, res) => {
   res.status(201).json({ message: "server started" });
